@@ -79,8 +79,6 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 /////////////////////////__FUNCTIONS__//////////////////////////////
 
-
-
 const formatMovementDate = date => {
   const calcDaysPassed = (day1, day2) =>
     Math.round(Math.abs((day2 - day1) / (1000 * 60 * 60 * 24)));
@@ -192,7 +190,29 @@ const calcDisplaySummary = function (acc) {
 
 console.log(totalDepositsUSD);
 
-let currentAccount;
+let currentAccount, timer;
+
+// Logout timer
+const logOutTimer = function () {
+  // Set time in seconds
+  let time = 120;
+  function tick() {
+    let minutes = String(Math.trunc(time / 60)).padStart(2, 0);
+
+    let sec = `${time % 60}`.padStart(2, 0);
+    time--;
+    // console.log(`${minutes} : ${sec}`);
+    if (time === 0) {
+      clearInterval(timer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Log in to get started`;
+    }
+    labelTimer.textContent = `${minutes} : ${sec}`;
+  }
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 
 // FAKE LOGIN FOR DEV PURPOSES
 currentAccount = account1;
@@ -211,6 +231,11 @@ btnLogin.addEventListener('click', function (e) {
       currentAccount.owner.split(' ')[0]
     }`;
 
+    //
+    // logOutTimer
+
+    if (timer) clearInterval(timer);
+    timer = logOutTimer();
     // Create current date and time
 
     const now = new Date();
@@ -258,6 +283,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     // Update UI
     updateUI(currentAccount);
+
+    // Reset The Timer
+    clearInterval(timer);
+    timer = logOutTimer();
   }
 });
 
@@ -275,6 +304,10 @@ btnLoan.addEventListener('click', function (e) {
       // Update UI
 
       updateUI(currentAccount);
+
+      // Reset The Timer
+      clearInterval(timer);
+      timer = logOutTimer();
 
       // Clear input
       inputLoanAmount.value = '';
